@@ -14,30 +14,36 @@ import { Scissors } from 'lucide-react';
 
 const loginSchema = z.object({
   username: z.string().min(1, 'Usuário é obrigatório'),
-  password: z.string().min(1, 'Senha é obrigatória')
+  password: z.string().min(1, 'Senha é obrigatória'),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const { login, registerUser } = useAuth(); // Funções de login e registro do contexto de autenticação
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting }
+    formState: { errors, isSubmitting },
   } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema)
+    resolver: zodResolver(loginSchema),
   });
 
   const onSubmit = async (data: LoginFormData) => {
     setError('');
-    
-    const success = login(data.username, data.password);
-    
-    if (!success) {
-      setError('Credenciais inválidas. Tente novamente.');
+
+    // Tenta registrar o usuário
+    const registrationSuccess = registerUser(data.username, data.password);
+    if (registrationSuccess) {
+      setError('Usuário cadastrado com sucesso! Você já pode fazer login.');
+    } else {
+      // Se o cadastro falhar, tenta fazer login
+      const loginSuccess = login(data.username, data.password);
+      if (!loginSuccess) {
+        setError('Credenciais inválidas. Tente novamente.');
+      }
     }
   };
 
@@ -50,12 +56,8 @@ export function LoginForm() {
               <Scissors className="h-8 w-8 text-pink-600" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold text-gray-900">
-            BARBEARIA LIDER
-          </CardTitle>
-          <CardDescription>
-            Sistema de Gestão do Salão
-          </CardDescription>
+          <CardTitle className="text-2xl font-bold text-gray-900">BARBEARIA LIDER</CardTitle>
+          <CardDescription>Sistema de Gestão do Salão</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -68,9 +70,7 @@ export function LoginForm() {
                 {...register('username')}
                 className={errors.username ? 'border-red-500' : ''}
               />
-              {errors.username && (
-                <p className="text-sm text-red-500">{errors.username.message}</p>
-              )}
+              {errors.username && <p className="text-sm text-red-500">{errors.username.message}</p>}
             </div>
 
             <div className="space-y-2">
@@ -82,9 +82,7 @@ export function LoginForm() {
                 {...register('password')}
                 className={errors.password ? 'border-red-500' : ''}
               />
-              {errors.password && (
-                <p className="text-sm text-red-500">{errors.password.message}</p>
-              )}
+              {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
             </div>
 
             {error && (
@@ -93,19 +91,17 @@ export function LoginForm() {
               </Alert>
             )}
 
-            <Button 
-              type="submit" 
-              className="w-full bg-pink-600 hover:bg-red-700"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? 'Entrando...' : 'Entrar'}
+            <Button type="submit" className="w-full bg-pink-600 hover:bg-red-700" disabled={isSubmitting}>
+              {isSubmitting ? 'Processando...' : 'Cadastrar / Entrar'}
             </Button>
           </form>
 
           <div className="mt-6 p-4 bg-gray-50 rounded-lg">
             <p className="text-sm text-gray-600 text-center">
-              <strong>Credenciais de acesso:</strong><br />
-              Usuário: admin<br />
+              <strong>Credenciais de acesso:</strong>
+              <br />
+              Usuário: admin
+              <br />
               Senha: salao123
             </p>
           </div>
