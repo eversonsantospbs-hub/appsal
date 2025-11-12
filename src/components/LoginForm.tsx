@@ -1,16 +1,13 @@
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useAuth } from '@/contexts/AuthContext';
-import { Scissors } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const loginSchema = z.object({
   username: z.string().min(1, 'Usuário é obrigatório'),
@@ -20,41 +17,24 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
-  const [error, setError] = useState('');
-  const { login } = useAuth(); // Apenas a função de login do contexto de autenticação
-
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
 
   const onSubmit = async (data: LoginFormData) => {
-    setError('');
-
-    // Verifica se as credenciais estão corretas
-    if (data.username === 'admin' && data.password === 'admin') {
-      // Login bem-sucedido
-      // Adicione aqui a lógica após o login bem-sucedido
-      console.log('Login bem-sucedido!');
-    } else {
-      setError('Credenciais inválidas. Tente novamente.');
-    }
+    console.log('Dados do formulário:', data);
+    // Aqui você pode capturar os dados para outros propósitos.
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 to-purple-50 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="flex justify-center mb-4">
-            <div className="bg-pink-100 p-3 rounded-full">
-              <Scissors className="h-8 w-8 text-pink-600" />
-            </div>
-          </div>
           <CardTitle className="text-2xl font-bold text-gray-900">BARBEARIA LIDER</CardTitle>
-          <CardDescription>Sistema de Gestão do Salão</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -82,26 +62,10 @@ export function LoginForm() {
               {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
             </div>
 
-            {error && (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-
-            <Button type="submit" className="w-full bg-pink-600 hover:bg-red-700" disabled={isSubmitting}>
-              {isSubmitting ? 'Entrando...' : 'Entrar'}
+            <Button type="submit" className="w-full bg-pink-600 hover:bg-red-700">
+              Enviar
             </Button>
           </form>
-
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-600 text-center">
-              <strong>Credenciais de acesso:</strong>
-              <br />
-              Usuário: admin
-              <br />
-              Senha: admin
-            </p>
-          </div>
         </CardContent>
       </Card>
     </div>
