@@ -34,13 +34,12 @@ export function LoginForm() {
   const onSubmit = async (data: LoginFormData) => {
     setError('');
 
-    // Verifica se as credenciais estão corretas
-    if (data.username === 'admin' && data.password === 'admin') {
-      // Login bem-sucedido
-      // Adicione aqui a lógica após o login bem-sucedido
-      console.log('Login bem-sucedido!');
-    } else {
+    // Tenta fazer login
+    const success = login(data.username, data.password);
+    if (!success) {
       setError('Credenciais inválidas. Tente novamente.');
+    } else {
+      console.log('Login bem-sucedido!'); // Aqui você pode redirecionar ou alterar o estado conforme necessário
     }
   };
 
@@ -79,31 +78,4 @@ export function LoginForm() {
                 {...register('password')}
                 className={errors.password ? 'border-red-500' : ''}
               />
-              {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
-            </div>
-
-            {error && (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-
-            <Button type="submit" className="w-full bg-pink-600 hover:bg-red-700" disabled={isSubmitting}>
-              {isSubmitting ? 'Entrando...' : 'Entrar'}
-            </Button>
-          </form>
-
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-600 text-center">
-              <strong>Credenciais de acesso:</strong>
-              <br />
-              Usuário: admin
-              <br />
-              Senha: admin
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
+              {errors.password && <p className="text-sm text-red-500">{errors
