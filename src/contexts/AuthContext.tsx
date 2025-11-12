@@ -1,24 +1,21 @@
 "use client";
 
 import React, { createContext, useContext, useState } from 'react';
-import { User } from '@/types';
 
 interface AuthContextType {
-  user: User | null;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-
   const logout = () => {
-    setUser(null);
+    // Lógica para sair caso seja necessária mais tarde
+    console.log('Logout chamado');
   };
 
   return (
-    <AuthContext.Provider value={{ user, logout }}>
+    <AuthContext.Provider value={{ logout }}>
       {children}
     </AuthContext.Provider>
   );
