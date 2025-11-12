@@ -1,28 +1,61 @@
-// contexts/AuthContext.js
+"use client";
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { User } from '@/types';
 
-const AuthContext = createContext();
+interface AuthContextType {
+  user: User | null;
+  login: (username: string, password: string) => boolean;
+  logout: () => void;
+  isLoading: boolean;
+}
 
-export function AuthProvider({ children }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-  const login = (username, password) => {
-    // Verifique as credenciais
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Verificar se há sessão salva no localStorage
+    const savedUser = localStorage.getItem('salon_user');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+    setIsLoading(false);
+  }, []);
+
+  const login = (username: string, password: string): boolean => {
+    // Credenciais fixas conforme especificação
     if (username === 'admin' && password === 'admin') {
-      setIsAuthenticated(true);
+      const newUser: User = {
+        id: '1',
+        username: 'admin',
+        isAuthenticated: true,
+      };
+      setUser(newUser);
+      localStorage.setItem('salon_user', JSON.stringify(newUser));
       return true; // Login bem-sucedido
     }
     return false; // Credenciais inválidas
   };
 
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem('salon_user');
+  };
+
   return (
-    <AuthContext.Provider value={{ login, isAuthenticated }}>
+    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
 export function useAuth() {
-  return useContext(AuthContext);
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 }
