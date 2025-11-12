@@ -21,7 +21,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
   const [error, setError] = useState('');
-  const { login, registerUser } = useAuth(); // Funções de login e registro do contexto de autenticação
+  const { login } = useAuth(); // Apenas a função de login do contexto de autenticação
 
   const {
     register,
@@ -34,16 +34,13 @@ export function LoginForm() {
   const onSubmit = async (data: LoginFormData) => {
     setError('');
 
-    // Tenta registrar o usuário
-    const registrationSuccess = registerUser(data.username, data.password);
-    if (registrationSuccess) {
-      setError('Usuário cadastrado com sucesso! Você já pode fazer login.');
+    // Verifica se as credenciais estão corretas
+    if (data.username === 'admin' && data.password === 'admin') {
+      // Login bem-sucedido
+      // Adicione aqui a lógica após o login bem-sucedido
+      console.log('Login bem-sucedido!');
     } else {
-      // Se o cadastro falhar, tenta fazer login
-      const loginSuccess = login(data.username, data.password);
-      if (!loginSuccess) {
-        setError('Credenciais inválidas. Tente novamente.');
-      }
+      setError('Credenciais inválidas. Tente novamente.');
     }
   };
 
@@ -92,7 +89,7 @@ export function LoginForm() {
             )}
 
             <Button type="submit" className="w-full bg-pink-600 hover:bg-red-700" disabled={isSubmitting}>
-              {isSubmitting ? 'Processando...' : 'Cadastrar / Entrar'}
+              {isSubmitting ? 'Entrando...' : 'Entrar'}
             </Button>
           </form>
 
@@ -102,7 +99,7 @@ export function LoginForm() {
               <br />
               Usuário: admin
               <br />
-              Senha: salao123
+              Senha: admin
             </p>
           </div>
         </CardContent>
