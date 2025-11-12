@@ -21,7 +21,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const { login, registerUser } = useAuth(); // Funções de login e registro do contexto de autenticação
 
   const {
     register,
@@ -33,11 +33,17 @@ export function LoginForm() {
 
   const onSubmit = async (data: LoginFormData) => {
     setError('');
-    
-    const success = login(data.username, data.password);
-    
-    if (!success) {
-      setError('Credenciais inválidas. Tente novamente.');
+
+    // Tenta registrar o usuário
+    const registrationSuccess = registerUser(data.username, data.password);
+    if (!registrationSuccess) {
+      // Se o cadastro falhar, tenta fazer login
+      const loginSuccess = login(data.username, data.password);
+      if (!loginSuccess) {
+        setError('Credenciais inválidas. Tente novamente.');
+      }
+    } else {
+      setError('Usuário cadastrado com sucesso! Você já pode fazer login.');
     }
   };
 
@@ -51,7 +57,7 @@ export function LoginForm() {
             </div>
           </div>
           <CardTitle className="text-2xl font-bold text-gray-900">
-            Só Elas Studio
+            BARBEARIA LIDER
           </CardTitle>
           <CardDescription>
             Sistema de Gestão do Salão
@@ -95,10 +101,10 @@ export function LoginForm() {
 
             <Button 
               type="submit" 
-              className="w-full bg-pink-600 hover:bg-pink-700"
+              className="w-full bg-pink-600 hover:bg-red-700"
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Entrando...' : 'Entrar'}
+              {isSubmitting ? 'Processando...' : 'Cadastrar / Entrar'}
             </Button>
           </form>
 
@@ -110,7 +116,4 @@ export function LoginForm() {
             </p>
           </div>
         </CardContent>
-      </Card>
-    </div>
-  );
-}
+     
