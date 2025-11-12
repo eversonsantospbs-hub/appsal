@@ -21,7 +21,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
   const [error, setError] = useState('');
-  const { login, registerUser } = useAuth(); // Funções de login e registro do contexto de autenticação
+  const { login } = useAuth();
 
   const {
     register,
@@ -33,17 +33,11 @@ export function LoginForm() {
 
   const onSubmit = async (data: LoginFormData) => {
     setError('');
-
-    // Tenta registrar o usuário
-    const registrationSuccess = registerUser(data.username, data.password);
-    if (!registrationSuccess) {
-      // Se o cadastro falhar, tenta fazer login
-      const loginSuccess = login(data.username, data.password);
-      if (!loginSuccess) {
-        setError('Credenciais inválidas. Tente novamente.');
-      }
-    } else {
-      setError('Usuário cadastrado com sucesso! Você já pode fazer login.');
+    
+    const success = login(data.username, data.password);
+    
+    if (!success) {
+      setError('Credenciais inválidas. Tente novamente.');
     }
   };
 
@@ -104,7 +98,7 @@ export function LoginForm() {
               className="w-full bg-pink-600 hover:bg-red-700"
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Processando...' : 'Cadastrar / Entrar'}
+              {isSubmitting ? 'Entrando...' : 'Entrar'}
             </Button>
           </form>
 
@@ -116,4 +110,7 @@ export function LoginForm() {
             </p>
           </div>
         </CardContent>
-     
+      </Card>
+    </div>
+  );
+}
